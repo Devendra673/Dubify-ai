@@ -1,0 +1,49 @@
+{% extends "_base.html" %}
+{% block title %}My Dashboard - Dubify AI{% endblock %}
+
+{% block content %}
+<section class="mt-16 max-w-5xl mx-auto" data-aos="fade-up">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800">My Projects</h1>
+        <a href="{{ url_for('index') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full font-semibold shadow-md transition-all transform hover:scale-105">+ New Project</a>
+    </div>
+
+    {% if projects %}
+        <div class="grid gap-6">
+            {% for project in projects %}
+            <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-center hover:border-indigo-300 transition-all">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-xs font-bold uppercase px-2 py-1 rounded bg-indigo-100 text-indigo-700">{{ project.source_lang }} ➔ {{ project.target_lang }}</span>
+                        <span class="text-xs text-gray-500">{{ project.date_posted.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 truncate w-64">{{ project.original_filename }}</h3>
+                </div>
+                
+                <div class="flex gap-3">
+                    {% if project.dubbed_filename %}
+                    <a href="{{ url_for('download_file', filename=project.dubbed_filename) }}" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        {{ 'Video' if project.file_type == 'video' else 'Audio' }}
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('download_file', filename=project.subtitle_filename) }}" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Subtitle
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-20 glass-card">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-600">No projects yet</h3>
+            <p class="text-gray-500 mt-2">Upload a file to get started!</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,358 @@
+{% extends "_base.html" %}
+
+{% block title %}Home - Dubify AI{% endblock %}
+
+{% block content %}
+
+<main class="grid lg:grid-cols-2 gap-16 items-center mt-8">
+    <div class="text-center lg:text-left" data-aos="fade-right">
+        <div class="inline-block px-4 py-2 bg-white/40 backdrop-blur-md rounded-full text-indigo-800 text-sm font-bold mb-6 border border-white/50 shadow-sm">
+            ✨ AI-Powered Video Translation
+        </div>
+        <h1 class="text-5xl lg:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
+            Translate content <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Without Limits</span>
+        </h1>
+        <p class="text-xl text-gray-700 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+            Break language barriers instantly. Upload your video, select from 22+ Indian languages, and get professional dubbing and subtitles in minutes.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <button id="hero-start-btn" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-xl shadow-xl shadow-indigo-500/30 transition-all transform hover:-translate-y-1">
+                Start Translating Now
+            </button>
+            <a href="{{ url_for('features') }}" class="px-8 py-4 bg-white text-gray-700 hover:text-indigo-600 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-100">
+                Explore Features
+            </a>
+        </div>
+    </div>
+
+    <div data-aos="fade-left" data-aos-delay="200">
+        <div class="glass-card p-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Upload Media</h2>
+            <p class="text-gray-500 mb-6 text-sm">Supported formats: MP4, MP3, WAV, AVI</p>
+            
+            <div id="drop-zone" class="w-full h-64 border-2 border-dashed border-indigo-200 rounded-2xl flex flex-col justify-center items-center bg-white/50 hover:bg-white/80 transition-all cursor-pointer group">
+                <div class="p-4 bg-indigo-50 text-indigo-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v9m0 0l-3-3m3 3l3-3"></path></svg>
+                </div>
+                <span id="drop-zone-text" class="text-gray-600 font-medium group-hover:text-indigo-700">Drag & Drop or Click to Browse</span>
+                <button id="process-trigger-btn" class="mt-6 px-6 py-2 bg-gray-300 text-white rounded-lg font-medium transition-colors cursor-not-allowed" disabled>
+                    Process File
+                </button>
+            </div>
+            <input type="file" id="file-upload" class="hidden">
+        </div>
+    </div>
+</main>
+
+<section id="processing-section" class="mt-24 hidden" data-aos="fade-up">
+    <div class="glass-card p-1">
+        <div id="status-header" class="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 rounded-t-xl text-white font-bold flex items-center">
+            <div id="status-loader" class="loader hidden border-white border-t-transparent"></div>
+            <span id="status-text">Ready</span>
+        </div>
+        
+        <div class="p-8 grid md:grid-cols-2 gap-12">
+            <div id="result-area" class="hidden transition-all duration-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">1. Original Text</h3>
+                    <span id="detected-lang-span" class="text-xs font-bold uppercase bg-indigo-100 text-indigo-600 px-2 py-1 rounded"></span>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 h-64 overflow-y-auto shadow-inner mb-6">
+                    <p id="result-text" class="text-gray-600 leading-relaxed text-sm"></p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Select Target Language</label>
+                        <select id="target-language" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white transition-all">
+                            <option value="en" data-lang-name="English">English</option>
+                            <option value="hi" data-lang-name="Hindi">Hindi (हिन्दी)</option>
+                            <optgroup label="Indian Languages">
+                                <option value="kn" data-lang-name="Kannada">Kannada (ಕನ್ನಡ)</option>
+                                <option value="ta" data-lang-name="Tamil">Tamil (தமிழ்)</option>
+                                <option value="te" data-lang-name="Telugu">Telugu (తెలుగు)</option>
+                                <option value="bn" data-lang-name="Bengali">Bengali (বাংলা)</option>
+                                <option value="ml" data-lang-name="Malayalam">Malayalam (മലയാളം)</option>
+                                <option value="gu" data-lang-name="Gujarati">Gujarati (ગુજરાતી)</option>
+                                <option value="mr" data-lang-name="Marathi">Marathi (मराठी)</option>
+                                <option value="pa" data-lang-name="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                                <option value="ur" data-lang-name="Urdu">Urdu (اُردُو)</option>
+                                <option value="as" data-lang-name="Assamese">Assamese (অসমীয়া)</option>
+                                <option value="brx" data-lang-name="Bodo">Bodo (बर' / बड़ो)</option>
+                                <option value="doi" data-lang-name="Dogri">Dogri (डोगरी)</option>
+                                <option value="ks" data-lang-name="Kashmiri">Kashmiri (کٲشُر)</option>
+                                <option value="kok" data-lang-name="Konkani">Konkani (कोंकणी)</option>
+                                <option value="mai" data-lang-name="Maithili">Maithili (मैथिली)</option>
+                                <option value="mni" data-lang-name="Manipuri">Manipuri (মৈতৈলোন্)</option>
+                                <option value="ne" data-lang-name="Nepali">Nepali (नेपाली)</option>
+                                <option value="or" data-lang-name="Odia">Odia (ଓଡ଼ିଆ)</option>
+                                <option value="sa" data-lang-name="Sanskrit">Sanskrit (संस्कृतम्)</option>
+                                <option value="sat" data-lang-name="Santali">Santali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                                <option value="sd" data-lang-name="Sindhi">Sindhi (सिन्धी)</option>
+                            </optgroup>
+                             <optgroup label="World Languages">
+                                <option value="fr" data-lang-name="French">French</option> 
+                                <option value="es" data-lang-name="Spanish">Spanish</option>
+                                <option value="de" data-lang-name="German">German</option>
+                                <option value="zh-CN" data-lang-name="Chinese">Chinese</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <button id="translate-btn" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-lg shadow-teal-500/30 transition-all transform hover:-translate-y-1">
+                        Translate Text
+                    </button>
+                </div>
+            </div>
+
+            <div id="translation-area" class="hidden transition-all duration-500">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">2. Translated Output</h3>
+                    <span id="target-lang-span" class="text-xs font-bold uppercase bg-teal-100 text-teal-600 px-2 py-1 rounded"></span>
+                </div>
+                <div class="bg-teal-50 rounded-xl p-4 border border-teal-100 h-64 overflow-y-auto shadow-inner mb-6">
+                    <p id="translation-text" class="text-gray-700 leading-relaxed text-sm"></p>
+                </div>
+                
+                <button id="dub-btn" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 transition-all transform hover:-translate-y-1">
+                    ✨ Generate Dubbed File
+                </button>
+            </div>
+        </div>
+        
+        <div id="download-area" class="hidden border-t border-gray-200 p-8 bg-gray-50 rounded-b-xl text-center animate-pulse">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">🎉 Success! Your files are ready.</h3>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a id="download-link-media" href="#" class="px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition-all">
+                    Download Media
+                </a>
+                <a id="download-link-subtitle" href="#" class="px-8 py-3 bg-gray-700 text-white font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-all">
+                    Download Subtitles (.srt)
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // UI References
+    const dropZone = document.getElementById('drop-zone');
+    const fileUpload = document.getElementById('file-upload');
+    const heroStartBtn = document.getElementById('hero-start-btn'); // Hero button
+    const processTriggerBtn = document.getElementById('process-trigger-btn'); // Button inside dropzone
+    const dropZoneText = document.getElementById('drop-zone-text');
+    const processingSection = document.getElementById('processing-section');
+    
+    const statusText = document.getElementById('status-text');
+    const statusHeader = document.getElementById('status-header');
+    const statusLoader = document.getElementById('status-loader');
+    
+    const resultArea = document.getElementById('result-area');
+    const resultText = document.getElementById('result-text');
+    const detectedLangSpan = document.getElementById('detected-lang-span');
+    
+    const translateBtn = document.getElementById('translate-btn');
+    const targetLanguageSelect = document.getElementById('target-language');
+    
+    const translationArea = document.getElementById('translation-area');
+    const translationText = document.getElementById('translation-text');
+    const targetLangSpan = document.getElementById('target-lang-span');
+    
+    const dubBtn = document.getElementById('dub-btn');
+    const downloadArea = document.getElementById('download-area');
+    const downloadLinkMedia = document.getElementById('download-link-media');
+    const downloadLinkSubtitle = document.getElementById('download-link-subtitle');
+
+    // Global State
+    let selectedFile = null;
+    let originalFilename = null;
+    let translatedTextData = null;
+    let detectedLanguageCode = null;
+    let detectedLanguageNameStr = null;
+    let targetLanguageCode = null;
+    let targetLanguageNameStr = null;
+
+    // --- 1. Helper Functions ---
+    function setStatus(message, type = 'processing') {
+        statusText.textContent = message;
+        
+        // Reset classes
+        statusHeader.classList.remove('from-indigo-600', 'to-purple-600', 'from-red-500', 'to-red-700', 'from-green-500', 'to-green-700');
+        statusLoader.classList.add('hidden');
+
+        if (type === 'processing') {
+            statusHeader.classList.add('from-indigo-600', 'to-purple-600');
+            statusLoader.classList.remove('hidden');
+        } else if (type === 'error') {
+            statusHeader.classList.add('from-red-500', 'to-red-700');
+        } else if (type === 'success') {
+            statusHeader.classList.add('from-green-500', 'to-green-700');
+        }
+    }
+
+    function getLangNameByCode(langCode) {
+        // Simple fallback map for common codes if needed, or use the dropdown options logic
+        const code = langCode.split('-')[0];
+        return code.toUpperCase(); // Simplified for visual
+    }
+
+    // --- 2. File Selection Logic ---
+    // Trigger file input from multiple places
+    [dropZone, heroStartBtn].forEach(el => el.addEventListener('click', (e) => {
+        if(e.target !== processTriggerBtn) fileUpload.click();
+    }));
+
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) updateFile(e.dataTransfer.files[0]);
+    });
+    fileUpload.addEventListener('change', () => { if (fileUpload.files.length) updateFile(fileUpload.files[0]); });
+
+    function updateFile(file) {
+        selectedFile = file;
+        dropZoneText.innerHTML = `<strong class="text-indigo-600">${file.name}</strong><br><span class="text-xs">Ready to process</span>`;
+        // Enable the process button inside the dropzone
+        processTriggerBtn.disabled = false;
+        processTriggerBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+        processTriggerBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white', 'shadow-lg');
+    }
+
+    // --- 3. Processing Logic (Transcription) ---
+    processTriggerBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent opening file dialog again
+        if (!selectedFile) return;
+
+        processingSection.classList.remove('hidden');
+        // Smooth scroll to processing section
+        setTimeout(() => {
+            window.scrollTo({ top: processingSection.offsetTop - 100, behavior: 'smooth' });
+        }, 100);
+
+        setStatus(`Transcribing "${selectedFile.name}"... Please wait.`);
+        resultArea.classList.add('hidden');
+        translationArea.classList.add('hidden');
+        downloadArea.classList.add('hidden');
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        fetch("{{ url_for('transcribe_audio') }}", { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                setStatus(`Error: ${data.error}`, 'error');
+            } else {
+                setStatus('Transcription complete! Select a language to translate.', 'success');
+                
+                if (data.transcription && data.transcription.trim()) {
+                    resultText.textContent = data.transcription;
+                    originalFilename = data.original_filename;
+                    detectedLanguageCode = data.detected_language;
+                    // Simple display name logic
+                    detectedLangSpan.textContent = detectedLanguageCode.toUpperCase();
+                    
+                    resultArea.classList.remove('hidden');
+                } else {
+                    setStatus('Transcription complete but no speech found.', 'error');
+                }
+            }
+        })
+        .catch(() => setStatus('Network error during transcription.', 'error'));
+    });
+
+    // --- 4. Translation Logic ---
+    translateBtn.addEventListener('click', () => {
+        const text = resultText.textContent;
+        const option = targetLanguageSelect.options[targetLanguageSelect.selectedIndex];
+        targetLanguageCode = targetLanguageSelect.value; // e.g. 'mai'
+        targetLanguageNameStr = option.getAttribute('data-lang-name');
+        
+        // Map Detected Code to Name for Prompt (simplified)
+        detectedLanguageNameStr = getLangNameByCode(detectedLanguageCode);
+
+        setStatus(`Translating to ${targetLanguageNameStr}...`, 'processing');
+        translationArea.classList.add('hidden');
+
+        fetch("{{ url_for('translate_text') }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                text: text,
+                source_lang_name: "Detected Language", // Or pass the code, backend handles it
+                target_lang_name: targetLanguageNameStr
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.error) {
+                setStatus(`Translation Error: ${data.error}`, 'error');
+            } else {
+                setStatus('Translation complete!', 'success');
+                translatedTextData = data.translated_text;
+                translationText.textContent = translatedTextData;
+                targetLangSpan.textContent = targetLanguageNameStr;
+                translationArea.classList.remove('hidden');
+            }
+        })
+        .catch(() => setStatus('Translation network error.', 'error'));
+    });
+
+    // --- 5. Dubbing Logic ---
+    dubBtn.addEventListener('click', () => {
+        setStatus('Generating AI Voice and Syncing... This may take time.', 'processing');
+        downloadArea.classList.add('hidden');
+
+        fetch("{{ url_for('dub_video') }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                text: translatedTextData,
+                filename: originalFilename,
+                target_lang_code: targetLanguageCode // e.g. 'mai'
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.error) {
+                // Special handling for TTS error to show subtitles are still ok
+                if(data.error.includes("Google TTS")) {
+                     setStatus(`${data.error} (Subtitles still generated)`, 'error');
+                     // Still show downloads if filenames exist (logic in backend needed to return filenames even on partial error, 
+                     // or we just fail here. Current backend returns 400. Let's stick to error for now.)
+                } else {
+                    setStatus(`Dubbing Error: ${data.error}`, 'error');
+                }
+            } else {
+                setStatus('Processing Complete!', 'success');
+                
+                if(data.file_type === 'video') {
+                    downloadLinkMedia.textContent = 'Download Video (.mp4)';
+                    downloadLinkMedia.href = `/download/${data.dubbed_filename}`;
+                    downloadLinkMedia.classList.remove('hidden');
+                } else if (data.file_type === 'audio') {
+                     downloadLinkMedia.textContent = 'Download Audio (.mp3)';
+                     downloadLinkMedia.href = `/download/${data.dubbed_filename}`;
+                     downloadLinkMedia.classList.remove('hidden');
+                }
+                
+                downloadLinkSubtitle.href = `/download/${data.subtitle_filename}`;
+                downloadArea.classList.remove('hidden');
+                
+                // Scroll to bottom
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
+        })
+        .catch(() => setStatus('Dubbing network error.', 'error'));
+    });
+
+</script>
+{% endblock %}
