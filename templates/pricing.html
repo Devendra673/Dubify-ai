@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+
+{% block title %}Pricing - Dubify AI{% endblock %}
+
+{% block content %}
+<section id="pricing" class="my-24 text-center py-16">
+    <h2 class="text-4xl font-bold text-gray-800">Pricing</h2>
+    <p class="mt-4 text-lg text-gray-500">Simple, transparent pricing for all our features.</p>
+    <div class="mt-8">
+        <div class="inline-block p-8 bg-white border border-gray-200 rounded-lg shadow-md">
+            <h3 class="text-2xl font-semibold text-gray-800">Pro Plan</h3>
+            <p class="text-5xl font-bold text-gray-900 my-4">$10<span class="text-lg font-normal text-gray-500">/mo</span></p>
+            <ul class="space-y-2 text-gray-600">
+                <li>Unlimited Transcriptions</li>
+                <li>Unlimited Translations</li>
+                <li>Video Dubbing Access</li>
+                <li>Priority Support</li>
+            </ul>
+            <form action="{{ url_for('create_checkout_session') }}" method="POST">
+                <button type="submit" class="mt-6 w-full px-6 py-3 bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 transition-colors">Checkout with Stripe</button>
+            </form>
+            <p class="mt-4 text-sm text-gray-400">Secure payment via Stripe.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}  

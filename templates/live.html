@@ -1,0 +1,148 @@
+{% extends "_base.html" %}
+{% block title %}Live Translate - Dubify AI{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto mt-16 text-center" data-aos="fade-up">
+    <h1 class="text-5xl font-bold text-gray-900 mb-6">Live Voice Translator</h1>
+    <p class="text-gray-600 mb-10 text-lg">Speak, and let AI translate for you instantly.</p>
+
+    <div class="bg-white/60 backdrop-blur-md border border-white/50 rounded-2xl p-6 shadow-lg mb-8 inline-block text-left">
+        <label class="block text-sm font-bold text-gray-700 mb-2">I want to speak and translate to:</label>
+        <select id="target-language" class="w-full md:w-80 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="hi" data-lang-name="Hindi">Hindi (हिन्दी)</option>
+            <option value="en" data-lang-name="English">English</option>
+            <option value="es" data-lang-name="Spanish">Spanish (Español)</option>
+            <option value="fr" data-lang-name="French">French (Français)</option>
+            <option value="de" data-lang-name="German">German (Deutsch)</option>
+            <option value="zh-CN" data-lang-name="Chinese">Chinese (中文)</option>
+            <option value="ja" data-lang-name="Japanese">Japanese (日本語)</option>
+            <option value="ko" data-lang-name="Korean">Korean (한국어)</option>
+        </select>
+    </div>
+
+    <div class="flex justify-center items-center mb-8">
+        <button id="record-btn" class="w-32 h-32 rounded-full bg-white border-4 border-indigo-100 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 group">
+            <div id="mic-icon" class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center group-hover:shadow-indigo-500/50 transition-all">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            </div>
+            <div id="recording-pulse" class="absolute w-32 h-32 rounded-full bg-red-500 opacity-0"></div>
+        </button>
+    </div>
+    
+    <p id="status-text" class="text-gray-500 font-medium mb-8">Click microphone to start recording</p>
+
+    <div id="results-area" class="hidden grid md:grid-cols-2 gap-6 text-left">
+        <div class="glass-card p-6">
+            <h3 class="text-sm font-bold text-gray-500 uppercase mb-2">You Said</h3>
+            <p id="original-text" class="text-gray-800 text-lg"></p>
+        </div>
+        <div class="glass-card p-6 bg-indigo-50 border-indigo-100">
+            <h3 class="text-sm font-bold text-indigo-500 uppercase mb-2">Translation</h3>
+            <p id="translated-text" class="text-indigo-900 text-lg font-medium"></p>
+            <div id="audio-player-container" class="mt-4 hidden">
+                <audio id="audio-player" controls class="w-full h-8"></audio>
+            </div>
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const recordBtn = document.getElementById('record-btn');
+    const statusText = document.getElementById('status-text');
+    const pulse = document.getElementById('recording-pulse');
+    const micIcon = document.getElementById('mic-icon');
+    const resultsArea = document.getElementById('results-area');
+    const originalTextEl = document.getElementById('original-text');
+    const translatedTextEl = document.getElementById('translated-text');
+    const audioPlayer = document.getElementById('audio-player');
+    const audioContainer = document.getElementById('audio-player-container');
+    const targetSelect = document.getElementById('target-language');
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    recordBtn.addEventListener('click', async () => {
+        if (!isRecording) {
+            // Start Recording
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    processAudio(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // UI Updates
+                statusText.textContent = "Listening... Click again to stop.";
+                pulse.classList.remove('opacity-0');
+                pulse.classList.add('animate-ping');
+                micIcon.classList.replace('from-indigo-500', 'from-red-500');
+                micIcon.classList.replace('to-purple-600', 'to-red-600');
+                
+            } catch (err) {
+                alert("Microphone access denied!");
+                console.error(err);
+            }
+        } else {
+            // Stop Recording
+            mediaRecorder.stop();
+            isRecording = false;
+            
+            // UI Updates
+            statusText.textContent = "Processing...";
+            pulse.classList.remove('animate-ping');
+            pulse.classList.add('opacity-0');
+            micIcon.classList.replace('from-red-500', 'from-indigo-500');
+            micIcon.classList.replace('to-red-600', 'to-purple-600');
+        }
+    });
+
+    async function processAudio(blob) {
+        const formData = new FormData();
+        formData.append('audio', blob);
+        
+        const option = targetSelect.options[targetSelect.selectedIndex];
+        formData.append('target_lang_code', targetSelect.value);
+        formData.append('target_lang_name', option.getAttribute('data-lang-name'));
+
+        try {
+            const response = await fetch("{{ url_for('live_translate') }}", {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.error) {
+                statusText.textContent = "Error: " + data.error;
+            } else {
+                statusText.textContent = "Translation Complete!";
+                resultsArea.classList.remove('hidden');
+                originalTextEl.textContent = data.original;
+                translatedTextEl.textContent = data.translated;
+                
+                if (data.audio_url) {
+                    audioContainer.classList.remove('hidden');
+                    audioPlayer.src = data.audio_url;
+                    audioPlayer.play();
+                } else {
+                    audioContainer.classList.add('hidden');
+                }
+            }
+        } catch (err) {
+            statusText.textContent = "Network Error.";
+            console.error(err);
+        }
+    }
+</script>
+{% endblock %}
