@@ -1,6 +1,7 @@
 🎬 Dubify AI
 Dubify AI is an intelligent video and audio dubbing platform that leverages AI to transcribe, translate, and dub content across multiple languages. Built with Flask, Whisper, and Google's Gemini AI, it provides both batch processing and real-time translation capabilities.
 
+
 ✨ Features
 🎯 Core Functionality
 Batch Video/Audio Dubbing: Upload videos or audio files and get them dubbed in your target language
@@ -9,6 +10,7 @@ AI-Powered Transcription: Automatic speech-to-text using OpenAI's Whisper (mediu
 Smart Translation: Powered by Google Gemini AI for accurate translations
 Subtitle Generation: Automatic SRT subtitle file creation with precise timestamps
 Noise Reduction: Audio preprocessing for better transcription accuracy
+
 🌍 Language Support
 Supports 19+ languages including:
 
@@ -17,21 +19,26 @@ Hindi (hi), Bengali (bn), Gujarati (gu), Kannada (kn)
 Malayalam (ml), Marathi (mr), Tamil (ta), Telugu (te), Urdu (ur)
 French (fr), Spanish (es), German (de), Italian (it)
 Japanese (ja), Korean (ko), Portuguese (pt), Russian (ru), Chinese (zh-CN)
+
 👤 User Management
 User registration and authentication
 Password reset functionality
 User dashboard with project history
 Pro membership integration via Stripe
+
 💬 AI Assistant
 Built-in chatbot ("Dubify Helper") powered by Gemini Flash
 Context-aware help and guidance
+
 🛠️ Technology Stack
 Backend: Flask (Python)
+
 AI/ML:
 OpenAI Whisper (transcription)
 Google Gemini AI (translation & chat)
 Google Text-to-Speech (gTTS)
 Database: SQLAlchemy with SQLite
+
 Audio Processing:
 FFmpeg
 soundfile
@@ -40,10 +47,12 @@ Authentication: Flask-Login
 Payment: Stripe
 Forms: Flask-WTF, WTForms
 📋 Prerequisites
+
 Python 3.8+
 FFmpeg installed and accessible in PATH
 Google Gemini API key
 Stripe API keys (for payment processing)
+
 🚀 Installation
 Clone the repository
 git clone https://github.com/Devendra673/Dubify-ai.git
@@ -91,6 +100,8 @@ Allow microphone access
 Select target language
 Speak into your microphone
 Get instant translation with audio playback
+
+
 📁 Project Structure
 Dubify-ai/
 ├── app.py                  # Main application file
@@ -137,6 +148,8 @@ source_lang: Source language code
 target_lang: Target language code
 file_type: video/audio/subtitle_only
 user_id: Foreign key to User
+
+
 🌐 API Endpoints
 Endpoint	Method	Description
 /api/transcribe	POST	Transcribe audio/video
